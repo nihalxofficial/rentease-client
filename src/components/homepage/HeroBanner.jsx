@@ -1,4 +1,3 @@
-// src/components/shared/HeroBanner.jsx
 "use client";
 
 import { useState } from "react";
@@ -17,16 +16,11 @@ import {
   Star,
   PlayCircle,
 } from "lucide-react";
-import {
-  Label,
-  ListBox,
-  Select,
-  Input,
-  Button,
-} from "@heroui/react";
+import { Label, ListBox, Select, Input, Button } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
-// ==================== HERO BANNER COMPONENT ====================
 export default function HeroBanner({
+
   title = "Find Your Dream Property",
   subtitle = "Discover thousands of rental properties across the country. Book your next home with ease and security.",
   backgroundImage = heroBg,
@@ -46,20 +40,22 @@ export default function HeroBanner({
   secondaryButtonText = "Watch Video",
   secondaryButtonLink = "#",
 }) {
-  // Form state
+  const router = useRouter();
   const [searchLocation, setSearchLocation] = useState("");
   const [propertyType, setPropertyType] = useState("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  // Handle search submission
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log("Searching:", { searchLocation, propertyType, minPrice, maxPrice });
-    // Add your search logic here
+    const params = new URLSearchParams();
+    if (searchLocation) params.set("location", searchLocation);
+    if (propertyType && propertyType !== "all") params.set("type", propertyType);
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+    router.push(`/properties?${params.toString()}`);
   };
 
-  // Property type options
   const propertyTypes = [
     { id: "all", label: "All Types" },
     { id: "apartment", label: "Apartment" },
@@ -70,9 +66,20 @@ export default function HeroBanner({
     { id: "townhouse", label: "Townhouse" },
   ];
 
+  // Inline style for Input — bypasses HeroUI's @layer components specificity entirely.
+  // bg-field and text-field-foreground from .input BEM class cannot be overridden
+  // by Tailwind className utilities because @layer components > @layer utilities.
+  // style prop always wins.
+  const inputStyle = {
+    backgroundColor: "#ffffff",
+    color: "#1e3a8a",       // blue-900 — typed text
+    borderColor: "#bfdbfe", // blue-200
+  };
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* ========== BACKGROUND IMAGE ========== */}
+
+      {/* ========== BACKGROUND ========== */}
       <div className="absolute inset-0 z-0">
         <Image
           src={backgroundImage}
@@ -89,8 +96,6 @@ export default function HeroBanner({
             opacity: overlayOpacity,
           }}
         />
-        
-        {/* Decorative floating elements */}
         <div className="absolute top-20 right-20 w-64 h-64 bg-white/5 rounded-full animate-float blur-2xl" />
         <div className="absolute bottom-20 left-20 w-96 h-96 bg-white/5 rounded-full animate-float blur-2xl" style={{ animationDelay: "2s" }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
@@ -99,22 +104,19 @@ export default function HeroBanner({
       {/* ========== CONTENT ========== */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
+
+          {/* ---------- Left ---------- */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="space-y-6"
           >
-            {/* Trust Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/30 backdrop-blur-sm rounded-full border border-white/30">
               <Shield className="w-4 h-4 text-blue-300" strokeWidth={2} />
-              <span className="text-sm font-medium text-white">
-                Trusted by 10,000+ Users
-              </span>
+              <span className="text-sm font-medium text-white">Trusted by 10,000+ Users</span>
             </div>
 
-            {/* Title */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight drop-shadow-lg">
               {title}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-blue-200 to-white mt-2 drop-shadow-lg">
@@ -122,12 +124,10 @@ export default function HeroBanner({
               </span>
             </h1>
 
-            {/* Subtitle */}
             <p className="text-lg text-white/95 max-w-lg leading-relaxed drop-shadow-md">
               {subtitle}
             </p>
 
-            {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 pt-2">
               <Link
                 href={primaryButtonLink}
@@ -145,7 +145,6 @@ export default function HeroBanner({
               </Link>
             </div>
 
-            {/* Stats */}
             {showStats && (
               <div className="flex flex-wrap gap-8 pt-4">
                 {stats.map((stat, index) => {
@@ -166,7 +165,7 @@ export default function HeroBanner({
             )}
           </motion.div>
 
-          {/* Right Side - Simple Image */}
+          {/* ---------- Right Image ---------- */}
           {showRightImage && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -175,21 +174,12 @@ export default function HeroBanner({
               className="hidden lg:flex justify-center"
             >
               <div className="relative w-full max-w-md">
-                {/* Main Image Card */}
                 <div className="relative bg-white/20 backdrop-blur-sm rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
                   <div className="relative h-[400px] w-full">
-                    <Image
-                      src={rightImage}
-                      alt={rightImageAlt}
-                      fill
-                      className="object-cover"
-                    />
-                    {/* Subtle gradient overlay for better aesthetics */}
+                    <Image src={rightImage} alt={rightImageAlt} fill className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                   </div>
                 </div>
-
-                {/* Rating Badge - Floating */}
                 <div className="absolute -top-4 -right-4 bg-white/95 backdrop-blur-sm rounded-2xl px-5 py-3 shadow-xl border border-white/50">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
@@ -201,8 +191,6 @@ export default function HeroBanner({
                     </div>
                   </div>
                 </div>
-
-                {/* Available Badge - Floating */}
                 <div className="absolute -bottom-2 -left-2 bg-emerald-500/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-white/30">
                   <p className="text-white text-xs font-semibold flex items-center gap-1.5">
                     <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -214,20 +202,21 @@ export default function HeroBanner({
           )}
         </div>
 
-        {/* ========== SEARCH BAR WITH HEROUIV3 ========== */}
+        {/* ========== SEARCH BAR ========== */}
         {showSearch && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            className="mt-12 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-4 md:p-6 max-w-4xl mx-auto border border-white/50"
+            className="search-card mt-12 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-4 md:p-6 max-w-4xl mx-auto border border-white/50"
           >
             <form onSubmit={handleSearch} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {/* Location Input */}
-                <div>
-                  <Label className="block text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1.5">
-                    <MapPin className="inline w-3.5 h-3.5 mr-1" strokeWidth={2} />
+
+                {/* --- Location --- */}
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs font-semibold text-blue-600 uppercase tracking-wider flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" strokeWidth={2} />
                     Location
                   </Label>
                   <Input
@@ -235,53 +224,61 @@ export default function HeroBanner({
                     placeholder="City, Area"
                     value={searchLocation}
                     onChange={(e) => setSearchLocation(e.target.value)}
-                    startContent={<MapPin className="w-4 h-4 text-blue-400" strokeWidth={2} />}
-                    className="w-full"
-                    classNames={{
-                      input: "bg-transparent text-gray-800 placeholder:text-gray-400",
-                      inputWrapper: "bg-white border-2 border-blue-200/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
-                    }}
+                    style={inputStyle}
+                    className="hero-input w-full px-3 py-2.5 text-sm border-2 rounded-xl shadow-sm outline-none transition-all duration-200"
                   />
                 </div>
 
-                {/* Property Type Select */}
-                <div>
-                  <Label className="block text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1.5">
-                    <Building2 className="inline w-3.5 h-3.5 mr-1" strokeWidth={2} />
+                {/* --- Property Type --- */}
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs font-semibold text-blue-600 uppercase tracking-wider flex items-center gap-1">
+                    <Building2 className="w-3.5 h-3.5" strokeWidth={2} />
                     Property Type
                   </Label>
                   <Select
                     className="w-full"
                     placeholder="All Types"
-                    selectedKeys={propertyType ? [propertyType] : []}
-                    onSelectionChange={(keys) => {
-                      const selected = Array.from(keys)[0];
-                      setPropertyType(selected || "all");
-                    }}
-                    variant="primary"
-                    classNames={{
-                      trigger: "bg-white border-2 border-blue-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 shadow-sm hover:border-blue-300 data-[open=true]:border-blue-500",
-                      value: "text-gray-800 placeholder:text-gray-400",
-                      indicator: "text-blue-400",
-                      popover: "bg-white rounded-xl shadow-lg border border-blue-100/50 mt-1",
-                      listBox: "p-1",
-                    }}
+                    value={propertyType}
+                    onChange={(val) => setPropertyType(val || "all")}
                   >
-                    <Select.Trigger>
-                      <Select.Value />
-                      <Select.Indicator />
+                    <Select.Trigger
+                      className="
+                        w-full flex items-center justify-between
+                        px-3 py-2.5 bg-white rounded-xl
+                        border-2 border-blue-200
+                        shadow-sm outline-none cursor-pointer
+                        hover:border-blue-300
+                        data-[focus-visible=true]:border-blue-600
+                        data-[focus-visible=true]:ring-2
+                        data-[focus-visible=true]:ring-blue-500/20
+                        transition-all duration-200
+                        min-h-[42px]
+                      "
+                    >
+                      <Select.Value className="text-sm text-blue-900 data-[placeholder=true]:text-blue-300 text-left" />
+                      <Select.Indicator className="text-blue-400 shrink-0 data-[open=true]:rotate-180 transition-transform duration-200" />
                     </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox>
+                    <Select.Popover className="bg-white border border-blue-100 rounded-xl shadow-lg mt-1 overflow-hidden z-50 min-w-[160px]">
+                      <ListBox className="p-1 outline-none">
                         {propertyTypes.map((type) => (
-                          <ListBox.Item 
-                            key={type.id} 
+                          <ListBox.Item
+                            key={type.id}
                             id={type.id}
                             textValue={type.label}
-                            className="hover:bg-blue-50 rounded-lg data-[selected=true]:bg-blue-100 data-[selected=true]:text-blue-700 transition-colors text-gray-700"
+                            className="
+                              flex items-center justify-between
+                              px-3 py-2 text-sm text-blue-900
+                              rounded-lg cursor-pointer outline-none
+                              hover:bg-blue-50 hover:text-blue-700
+                              data-[selected=true]:bg-blue-100
+                              data-[selected=true]:text-blue-700
+                              data-[selected=true]:font-semibold
+                              data-[focused=true]:bg-blue-50
+                              transition-colors duration-150
+                            "
                           >
                             {type.label}
-                            <ListBox.ItemIndicator />
+                            <ListBox.ItemIndicator className="text-blue-600 ml-2" />
                           </ListBox.Item>
                         ))}
                       </ListBox>
@@ -289,61 +286,54 @@ export default function HeroBanner({
                   </Select>
                 </div>
 
-                {/* Min Price Input */}
-                <div>
-                  <Label className="block text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1.5">
-                    <DollarSign className="inline w-3.5 h-3.5 mr-1" strokeWidth={2} />
+                {/* --- Min Price --- */}
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs font-semibold text-blue-600 uppercase tracking-wider flex items-center gap-1">
+                    <DollarSign className="w-3.5 h-3.5" strokeWidth={2} />
                     Min Price
                   </Label>
                   <Input
                     type="number"
-                    placeholder="$0"
+                    placeholder="0"
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value)}
-                    startContent={<DollarSign className="w-4 h-4 text-blue-400" strokeWidth={2} />}
-                    className="w-full"
-                    classNames={{
-                      input: "bg-transparent text-gray-800 placeholder:text-gray-400",
-                      inputWrapper: "bg-white border-2 border-blue-200/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
-                    }}
+                    style={inputStyle}
+                    className="hero-input w-full px-3 py-2.5 text-sm border-2 rounded-xl shadow-sm outline-none transition-all duration-200 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   />
                 </div>
 
-                {/* Max Price Input */}
-                <div>
-                  <Label className="block text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1.5">
-                    <DollarSign className="inline w-3.5 h-3.5 mr-1" strokeWidth={2} />
+                {/* --- Max Price --- */}
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs font-semibold text-blue-600 uppercase tracking-wider flex items-center gap-1">
+                    <DollarSign className="w-3.5 h-3.5" strokeWidth={2} />
                     Max Price
                   </Label>
                   <Input
                     type="number"
-                    placeholder="$10,000"
+                    placeholder="10,000"
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value)}
-                    startContent={<DollarSign className="w-4 h-4 text-blue-400" strokeWidth={2} />}
-                    className="w-full"
-                    classNames={{
-                      input: "bg-transparent text-gray-800 placeholder:text-gray-400",
-                      inputWrapper: "bg-white border-2 border-blue-200/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
-                    }}
+                    style={inputStyle}
+                    className="hero-input w-full px-3 py-2.5 text-sm border-2 rounded-xl shadow-sm outline-none transition-all duration-200 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   />
                 </div>
               </div>
 
               {/* Search Button */}
-              <Button
-                type="submit"
-                className="w-full md:w-auto px-12 py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.45)] transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 mx-auto"
-                startContent={<Search className="w-5 h-5" strokeWidth={2} />}
-              >
-                Search Properties
-              </Button>
+              <div className="flex justify-center pt-1">
+                <Button
+                  type="submit"
+                  className="inline-flex items-center gap-2 px-12 py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.45)] hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+                >
+                  <Search className="w-5 h-5" strokeWidth={2} />
+                  Search Properties
+                </Button>
+              </div>
             </form>
           </motion.div>
         )}
       </div>
 
-      {/* ========== ANIMATION STYLES ========== */}
       <style jsx>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
@@ -351,6 +341,28 @@ export default function HeroBanner({
         }
         .animate-float {
           animation: float 6s ease-in-out infinite;
+        }
+
+        /*
+          Override HeroUI v3's .input BEM class scoped to the search card.
+          HeroUI puts component styles in @layer components which beats @layer utilities,
+          so Tailwind className alone can't win. But:
+          1. style prop (inline) always beats CSS layers — used for bg + text color.
+          2. @layer components with higher specificity (.search-card .input) beats
+             the generic .input rule — used for placeholder (can't do via style prop).
+        */
+        @layer components {
+          .search-card .hero-input::placeholder {
+            color: #93c5fd; /* blue-300 */
+          }
+          .search-card .hero-input:hover {
+            border-color: #93c5fd; /* blue-300 */
+          }
+          .search-card .hero-input:focus,
+          .search-card .hero-input:focus-visible {
+            border-color: #2563eb; /* blue-600 */
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+          }
         }
       `}</style>
     </section>

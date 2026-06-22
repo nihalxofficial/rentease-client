@@ -1,12 +1,2 @@
 @import "tailwindcss";
 @import "@heroui/styles";
-
-:root {
-  /* Sets the brand/accent color — used for focus rings, selected states, highlights */
-  --accent: oklch(0.5 0.2 250);            /* ≈ blue-600 in oklch */
-  --accent-foreground: oklch(0.98 0 0);   /* white text on accent */
-
-  /* Field-specific overrides */
-  --field-border: oklch(0.82 0.06 250);   /* blue-200 border at rest */
-  --field-background: #ffffff;
-}
