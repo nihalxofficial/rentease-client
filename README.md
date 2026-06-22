@@ -2,6 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+# Tech Stack
+- Next.js
+- HeroUi
+- TailwindCss
+- Framer Motion
+- Next-themes
+- Gravity Ui Icons
+- React Icons
+- Lucide React
+
 First, run the development server:
 
 ```bash
