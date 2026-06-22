@@ -1,3 +1,4 @@
+// src/app/register/page.jsx
 "use client";
 
 import { useState } from "react";
@@ -25,6 +26,7 @@ import {
   Home,
   Users,
   Building2,
+  Image as ImageIcon,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "react-toastify";
@@ -44,7 +46,6 @@ export default function RegisterPage() {
     const formData = new FormData(e.currentTarget);
     const userData = Object.fromEntries(formData.entries());
     const {email, password, image, name} = userData;
-
 
     const { data, error } = await authClient.signUp.email({
         email, 
@@ -232,124 +233,162 @@ export default function RegisterPage() {
               className="flex flex-col gap-5"
               onSubmit={handleSubmit}
             >
-              {/* Name Field */}
-              <TextField
-                isRequired
-                name="name"
-                validate={(value) => {
-                  if (value.length < 2) {
-                    return "Name must be at least 2 characters";
-                  }
-                  return null;
-                }}
-              >
-                <Label className="text-sm font-medium text-gray-700">Full Name</Label>
-                <Input
-                  placeholder="John Doe"
-                  startContent={<User className="w-4 h-4 text-gray-400" strokeWidth={2} />}
-                  className="w-full"
-                  classNames={{
-                    input: "bg-transparent text-gray-800 placeholder:text-gray-400",
-                    inputWrapper: "bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
+              {/* Name & Email - Side by Side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextField
+                  isRequired
+                  name="name"
+                  validate={(value) => {
+                    if (value.length < 2) {
+                      return "Name must be at least 2 characters";
+                    }
+                    return null;
                   }}
-                />
-                <FieldError />
-              </TextField>
-
-              {/* Email Field */}
-              <TextField
-                isRequired
-                name="email"
-                type="email"
-                validate={(value) => {
-                  if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                    return "Please enter a valid email address";
-                  }
-                  return null;
-                }}
-              >
-                <Label className="text-sm font-medium text-gray-700">Email Address</Label>
-                <Input
-                  placeholder="john@example.com"
-                  startContent={<Mail className="w-4 h-4 text-gray-400" strokeWidth={2} />}
-                  className="w-full"
-                  classNames={{
-                    input: "bg-transparent text-gray-800 placeholder:text-gray-400",
-                    inputWrapper: "bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
-                  }}
-                />
-                <FieldError />
-              </TextField>
-
-              {/* Password Field with Toggle */}
-              <TextField
-                isRequired
-                minLength={8}
-                name="password"
-                type={isPasswordVisible ? "text" : "password"}
-                validate={validatePassword}
-              >
-                <Label className="text-sm font-medium text-gray-700">Password</Label>
-                <InputGroup>
-                  <InputGroup.Input
-                    placeholder="Enter your password"
-                    startContent={<Lock className="w-4 h-4 text-gray-400" strokeWidth={2} />}
+                >
+                  <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <User className="w-4 h-4 text-blue-600" strokeWidth={2} />
+                    Full Name
+                  </Label>
+                  <Input
+                    placeholder="John Doe"
                     className="w-full"
                     classNames={{
                       input: "bg-transparent text-gray-800 placeholder:text-gray-400",
                       inputWrapper: "bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
                     }}
                   />
-                  <InputGroup.Suffix className="pr-1">
-                    <Button
-                      isIconOnly
-                      aria-label={isPasswordVisible ? "Hide password" : "Show password"}
-                      size="sm"
-                      variant="ghost"
-                      onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                      className="cursor-pointer text-gray-400 hover:text-gray-600"
-                    >
-                      {isPasswordVisible ? <Eye className="w-4 h-4" /> : <EyeSlash className="w-4 h-4" />}
-                    </Button>
-                  </InputGroup.Suffix>
-                </InputGroup>
+                  <FieldError />
+                </TextField>
+
+                <TextField
+                  isRequired
+                  name="email"
+                  type="email"
+                  validate={(value) => {
+                    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+                      return "Please enter a valid email address";
+                    }
+                    return null;
+                  }}
+                >
+                  <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-blue-600" strokeWidth={2} />
+                    Email Address
+                  </Label>
+                  <Input
+                    placeholder="john@example.com"
+                    className="w-full"
+                    classNames={{
+                      input: "bg-transparent text-gray-800 placeholder:text-gray-400",
+                      inputWrapper: "bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
+                    }}
+                  />
+                  <FieldError />
+                </TextField>
+              </div>
+
+              {/* Password & Confirm Password - Side by Side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextField
+                  isRequired
+                  minLength={8}
+                  name="password"
+                  type={isPasswordVisible ? "text" : "password"}
+                  validate={validatePassword}
+                >
+                  <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-blue-600" strokeWidth={2} />
+                    Password
+                  </Label>
+                  <InputGroup>
+                    <InputGroup.Input
+                      placeholder="Enter your password"
+                      className="w-full"
+                      classNames={{
+                        input: "bg-transparent text-gray-800 placeholder:text-gray-400",
+                        inputWrapper: "bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
+                      }}
+                    />
+                    <InputGroup.Suffix className="pr-1">
+                      <Button
+                        isIconOnly
+                        aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                        size="sm"
+                        variant="ghost"
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        className="cursor-pointer text-gray-400 hover:text-gray-600"
+                      >
+                        {isPasswordVisible ? <Eye className="w-4 h-4" /> : <EyeSlash className="w-4 h-4" />}
+                      </Button>
+                    </InputGroup.Suffix>
+                  </InputGroup>
+                  <Description className="text-xs text-gray-400">
+                    Must be at least 8 characters
+                  </Description>
+                  <FieldError />
+                </TextField>
+
+                <TextField
+                  isRequired
+                  name="confirmPassword"
+                  type={isConfirmPasswordVisible ? "text" : "password"}
+                  validate={validateConfirmPassword}
+                >
+                  <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-blue-600" strokeWidth={2} />
+                    Confirm Password
+                  </Label>
+                  <InputGroup>
+                    <InputGroup.Input
+                      placeholder="Confirm your password"
+                      className="w-full"
+                      classNames={{
+                        input: "bg-transparent text-gray-800 placeholder:text-gray-400",
+                        inputWrapper: "bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
+                      }}
+                    />
+                    <InputGroup.Suffix className="pr-1">
+                      <Button
+                        isIconOnly
+                        aria-label={isConfirmPasswordVisible ? "Hide password" : "Show password"}
+                        size="sm"
+                        variant="ghost"
+                        onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
+                        className="cursor-pointer text-gray-400 hover:text-gray-600"
+                      >
+                        {isConfirmPasswordVisible ? <Eye className="w-4 h-4" /> : <EyeSlash className="w-4 h-4" />}
+                      </Button>
+                    </InputGroup.Suffix>
+                  </InputGroup>
+                  <FieldError />
+                </TextField>
+              </div>
+
+              {/* Image URL Field - Full Width */}
+              <TextField
+                name="image"
+                validate={(value) => {
+                  if (value && !/^https?:\/\/.+\..+/.test(value)) {
+                    return "Please enter a valid image URL";
+                  }
+                  return null;
+                }}
+              >
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-blue-600" strokeWidth={2} />
+                  Profile Image URL
+                </Label>
+                <Input
+                  placeholder="https://example.com/avatar.jpg"
+                  className="w-full"
+                  classNames={{
+                    input: "bg-transparent text-gray-800 placeholder:text-gray-400",
+                    inputWrapper: "bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
+                  }}
+                />
                 <Description className="text-xs text-gray-400">
-                  Must be at least 8 characters
+                  Optional: Enter a URL for your profile picture
                 </Description>
-                <FieldError />
-              </TextField>
-
-              {/* Confirm Password Field with Toggle */}
-              <TextField
-                isRequired
-                name="confirmPassword"
-                type={isConfirmPasswordVisible ? "text" : "password"}
-                validate={validateConfirmPassword}
-              >
-                <Label className="text-sm font-medium text-gray-700">Confirm Password</Label>
-                <InputGroup>
-                  <InputGroup.Input
-                    placeholder="Confirm your password"
-                    startContent={<Lock className="w-4 h-4 text-gray-400" strokeWidth={2} />}
-                    className="w-full"
-                    classNames={{
-                      input: "bg-transparent text-gray-800 placeholder:text-gray-400",
-                      inputWrapper: "bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-blue-300",
-                    }}
-                  />
-                  <InputGroup.Suffix className="pr-1">
-                    <Button
-                      isIconOnly
-                      aria-label={isConfirmPasswordVisible ? "Hide password" : "Show password"}
-                      size="sm"
-                      variant="ghost"
-                      onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-                      className="cursor-pointer text-gray-400 hover:text-gray-600"
-                    >
-                      {isConfirmPasswordVisible ? <Eye className="w-4 h-4" /> : <EyeSlash className="w-4 h-4" />}
-                    </Button>
-                  </InputGroup.Suffix>
-                </InputGroup>
                 <FieldError />
               </TextField>
 

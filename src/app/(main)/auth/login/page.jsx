@@ -223,10 +223,12 @@ export default function LoginPage() {
                 type="email"
                 validate={validateEmail}
               >
-                <Label className="text-sm font-medium text-gray-700">Email Address</Label>
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-blue-600" strokeWidth={2} />
+                  Email Address
+                </Label>
                 <Input
                   placeholder="john@example.com"
-                  startContent={<Mail className="w-4 h-4 text-gray-400" strokeWidth={2} />}
                   className="w-full"
                   classNames={{
                     input: "bg-transparent text-gray-800 placeholder:text-gray-400",
@@ -248,11 +250,13 @@ export default function LoginPage() {
                   return null;
                 }}
               >
-                <Label className="text-sm font-medium text-gray-700">Password</Label>
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-blue-600" strokeWidth={2} />
+                  Password
+                </Label>
                 <InputGroup>
                   <InputGroup.Input
                     placeholder="Enter your password"
-                    startContent={<Lock className="w-4 h-4 text-gray-400" strokeWidth={2} />}
                     className="w-full"
                     classNames={{
                       input: "bg-transparent text-gray-800 placeholder:text-gray-400",
