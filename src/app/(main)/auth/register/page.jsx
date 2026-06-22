@@ -28,9 +28,11 @@ import {
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 // ==================== REGISTER PAGE ====================
 export default function RegisterPage() {
+  const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +54,8 @@ export default function RegisterPage() {
     })
 
     if(data){
-      toast.success("Registration Successful🎉")
+      toast.success("Registration Successful🎉");
+      router.push("/")
     }
     if(error){
       toast.error(error.message);
@@ -311,7 +314,7 @@ export default function RegisterPage() {
                   </InputGroup.Suffix>
                 </InputGroup>
                 <Description className="text-xs text-gray-400">
-                  Must be at least 8 characters with 1 uppercase, 1 number, and 1 special character
+                  Must be at least 8 characters
                 </Description>
                 <FieldError />
               </TextField>

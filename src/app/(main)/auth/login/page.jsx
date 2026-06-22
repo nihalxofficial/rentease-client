@@ -6,17 +6,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
-import authImage from "@/assets/register.png";
-import { 
-  Form, 
-  Input, 
-  Label, 
-  TextField, 
-  Button, 
-  FieldError, 
+import {
+  Form,
+  Input,
+  Label,
+  TextField,
+  Button,
+  FieldError,
   InputGroup,
 } from "@heroui/react";
-import { 
+import {
   Mail,
   Lock,
   Sparkles,
@@ -27,9 +26,13 @@ import {
   Building2,
   LogIn,
 } from "lucide-react";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 // ==================== LOGIN PAGE ====================
 export default function LoginPage() {
+  const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -37,18 +40,28 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    const formDataObj = new FormData(e.currentTarget);
-    const data = {};
-    formDataObj.forEach((value, key) => {
-      data[key] = value.toString();
+
+    const formData = new FormData(e.currentTarget);
+    const userData = Object.fromEntries(formData.entries());
+    const {email, password} = userData
+
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+      rememberMe: true,
     });
-    
-    console.log("Login Data:", data);
+
+    if(data){
+      toast.success("Login Successful🎉")
+      router.push("/")
+    }
+
+    if(error){
+      toast.error(error.message)
+    }
+    console.log(data);
+
     setIsLoading(false);
-    alert("Login successful! Redirecting to dashboard...");
   };
 
   const validateEmail = (value) => {
@@ -199,7 +212,7 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <Form 
+            <Form
               className="flex flex-col gap-5"
               onSubmit={handleSubmit}
             >
