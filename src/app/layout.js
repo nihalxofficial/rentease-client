@@ -1,5 +1,6 @@
 import { Josefin_Sans } from "next/font/google";
 import "./globals.css";
+import { ToastContainer } from "react-toastify";
 
 const josefin = Josefin_Sans({
   variable: "--font-josefin-sans",
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning className={`${josefin.className} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
           {children}
+          <ToastContainer autoClose={2000} />
       </body>
     </html>
   );

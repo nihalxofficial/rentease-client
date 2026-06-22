@@ -7,10 +7,25 @@ const db = client.db("rentease_db");
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
-    // Optional: if you don't provide a client, database transactions won't be enabled.
-    client
+    client,
   }),
-  emailAndPassword: { 
-    enabled: true, 
+  emailAndPassword: {
+    enabled: true,
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "tenant",
+      },
+      plan: {
+        type: "string",
+        defaultValue: "free",
+      },
+      status: {
+        type: "string",
+        defaultValue: "active",
+      },
+    },
   },
 });

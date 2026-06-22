@@ -15,6 +15,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - Better Auth
 - MongoDB
 - MongoDB Atlas
+- React Toast
 
 First, run the development server:
 
