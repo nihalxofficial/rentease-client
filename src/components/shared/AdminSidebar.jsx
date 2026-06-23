@@ -1,4 +1,4 @@
-// src/components/shared/OwnerSidebar.jsx
+// src/components/shared/AdminSidebar.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,18 +8,20 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
+  Users,
   Building2,
-  PlusCircle,
   CalendarCheck,
+  DollarSign,
   Settings,
   LogOut,
   Menu,
   X,
+  Shield,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 
-// ==================== OWNER SIDEBAR ====================
-export default function OwnerSidebar({ isOpen = true }) {
+// ==================== ADMIN SIDEBAR ====================
+export default function AdminSidebar({ isOpen = true }) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -30,27 +32,32 @@ export default function OwnerSidebar({ isOpen = true }) {
   const menuItems = [
     {
       name: "Dashboard",
-      href: "/dashboard/owner",
+      href: "/dashboard/admin",
       icon: LayoutDashboard,
     },
     {
-      name: "Add Property",
-      href: "/dashboard/owner/add-property",
-      icon: PlusCircle,
+      name: "All Users",
+      href: "/dashboard/admin/users",
+      icon: Users,
     },
     {
-      name: "My Properties",
-      href: "/dashboard/owner/properties",
+      name: "All Properties",
+      href: "/dashboard/admin/properties",
       icon: Building2,
     },
     {
-      name: "Booking Requests",
-      href: "/dashboard/owner/bookings",
+      name: "All Bookings",
+      href: "/dashboard/admin/bookings",
       icon: CalendarCheck,
     },
     {
+      name: "Transactions",
+      href: "/dashboard/admin/transactions",
+      icon: DollarSign,
+    },
+    {
       name: "Settings",
-      href: "/dashboard/owner/settings",
+      href: "/dashboard/admin/settings",
       icon: Settings,
     },
   ];
@@ -157,13 +164,13 @@ export default function OwnerSidebar({ isOpen = true }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-gray-900 truncate">
-              {user?.name || "User"}
+              {user?.name || "Admin"}
             </p>
             <p className="text-xs text-gray-500 truncate">
               {user?.email}
             </p>
             <span className="inline-block mt-0.5 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-semibold rounded-full">
-              Owner
+              Administrator
             </span>
           </div>
         </div>

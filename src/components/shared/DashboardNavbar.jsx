@@ -259,7 +259,7 @@ export default function DashboardNavbar({ toggleSidebar, isSidebarOpen }) {
                     </div>
                     <div className="px-4 py-2 border-t border-gray-100">
                       <Link
-                        href="/dashboard/owner/notifications"
+                        href="#"
                         className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center gap-1 cursor-pointer"
                         onClick={() => setIsNotificationsOpen(false)}
                       >

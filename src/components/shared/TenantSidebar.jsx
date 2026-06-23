@@ -1,4 +1,4 @@
-// src/components/shared/OwnerSidebar.jsx
+// src/components/shared/TenantSidebar.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,9 +8,9 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
-  Building2,
-  PlusCircle,
   CalendarCheck,
+  Heart,
+  User,
   Settings,
   LogOut,
   Menu,
@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 
-// ==================== OWNER SIDEBAR ====================
-export default function OwnerSidebar({ isOpen = true }) {
+// ==================== TENANT SIDEBAR ====================
+export default function TenantSidebar({ isOpen = true }) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -30,27 +30,27 @@ export default function OwnerSidebar({ isOpen = true }) {
   const menuItems = [
     {
       name: "Dashboard",
-      href: "/dashboard/owner",
+      href: "/dashboard/tenant",
       icon: LayoutDashboard,
     },
     {
-      name: "Add Property",
-      href: "/dashboard/owner/add-property",
-      icon: PlusCircle,
-    },
-    {
-      name: "My Properties",
-      href: "/dashboard/owner/properties",
-      icon: Building2,
-    },
-    {
-      name: "Booking Requests",
-      href: "/dashboard/owner/bookings",
+      name: "My Bookings",
+      href: "/dashboard/tenant/bookings",
       icon: CalendarCheck,
     },
     {
+      name: "Favorites",
+      href: "/dashboard/tenant/favorites",
+      icon: Heart,
+    },
+    {
+      name: "Profile",
+      href: "/dashboard/tenant/profile",
+      icon: User,
+    },
+    {
       name: "Settings",
-      href: "/dashboard/owner/settings",
+      href: "/dashboard/tenant/settings",
       icon: Settings,
     },
   ];
@@ -163,7 +163,7 @@ export default function OwnerSidebar({ isOpen = true }) {
               {user?.email}
             </p>
             <span className="inline-block mt-0.5 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-semibold rounded-full">
-              Owner
+              Tenant
             </span>
           </div>
         </div>

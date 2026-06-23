@@ -273,9 +273,9 @@ export default function OwnerDashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">
-            Dashboard
+            Owner <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-700">Dashboard</span>
           </h1>
-          <p className="text-gray-500 mt-1">Welcome back, John! Here's what's happening with your properties.</p>
+          <p className="text-gray-500 mt-1">Welcome back! Here's what's happening with your properties.</p>
         </div>
         <Link
           href="/dashboard/owner/add-property"
