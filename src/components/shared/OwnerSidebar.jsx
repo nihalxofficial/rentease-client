@@ -32,26 +32,31 @@ export default function OwnerSidebar({ isOpen = true }) {
       name: "Dashboard",
       href: "/dashboard/owner",
       icon: LayoutDashboard,
+      exact: true, // Exact match for dashboard
     },
     {
       name: "Add Property",
       href: "/dashboard/owner/add-property",
       icon: PlusCircle,
+      exact: true,
     },
     {
       name: "My Properties",
       href: "/dashboard/owner/properties",
       icon: Building2,
+      exact: true,
     },
     {
       name: "Booking Requests",
       href: "/dashboard/owner/bookings",
       icon: CalendarCheck,
+      exact: true,
     },
     {
       name: "Settings",
       href: "/dashboard/owner/settings",
       icon: Settings,
+      exact: true,
     },
   ];
 
@@ -77,7 +82,11 @@ export default function OwnerSidebar({ isOpen = true }) {
   };
 
   const NavItem = ({ item }) => {
-    const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+    // Check exact match or starts with for sub-routes
+    const isActive = item.exact 
+      ? pathname === item.href 
+      : pathname?.startsWith(item.href + '/') || pathname === item.href;
+    
     const Icon = item.icon;
 
     return (

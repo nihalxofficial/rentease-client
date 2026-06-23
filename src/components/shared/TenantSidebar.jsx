@@ -32,26 +32,31 @@ export default function TenantSidebar({ isOpen = true }) {
       name: "Dashboard",
       href: "/dashboard/tenant",
       icon: LayoutDashboard,
+      exact: true,
     },
     {
       name: "My Bookings",
       href: "/dashboard/tenant/bookings",
       icon: CalendarCheck,
+      exact: true,
     },
     {
       name: "Favorites",
       href: "/dashboard/tenant/favorites",
       icon: Heart,
+      exact: true,
     },
     {
       name: "Profile",
       href: "/dashboard/tenant/profile",
       icon: User,
+      exact: true,
     },
     {
       name: "Settings",
       href: "/dashboard/tenant/settings",
       icon: Settings,
+      exact: true,
     },
   ];
 
@@ -77,7 +82,11 @@ export default function TenantSidebar({ isOpen = true }) {
   };
 
   const NavItem = ({ item }) => {
-    const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+    // Exact match for active state
+    const isActive = item.exact 
+      ? pathname === item.href 
+      : pathname?.startsWith(item.href + '/') || pathname === item.href;
+    
     const Icon = item.icon;
 
     return (

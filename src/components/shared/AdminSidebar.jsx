@@ -34,31 +34,37 @@ export default function AdminSidebar({ isOpen = true }) {
       name: "Dashboard",
       href: "/dashboard/admin",
       icon: LayoutDashboard,
+      exact: true,
     },
     {
       name: "All Users",
       href: "/dashboard/admin/users",
       icon: Users,
+      exact: true,
     },
     {
       name: "All Properties",
       href: "/dashboard/admin/properties",
       icon: Building2,
+      exact: true,
     },
     {
       name: "All Bookings",
       href: "/dashboard/admin/bookings",
       icon: CalendarCheck,
+      exact: true,
     },
     {
       name: "Transactions",
       href: "/dashboard/admin/transactions",
       icon: DollarSign,
+      exact: true,
     },
     {
       name: "Settings",
       href: "/dashboard/admin/settings",
       icon: Settings,
+      exact: true,
     },
   ];
 
@@ -84,7 +90,8 @@ export default function AdminSidebar({ isOpen = true }) {
   };
 
   const NavItem = ({ item }) => {
-    const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+    // Exact match for active state - only highlight when pathname exactly matches href
+    const isActive = pathname === item.href;
     const Icon = item.icon;
 
     return (
