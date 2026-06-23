@@ -1,8 +1,8 @@
 import { getRequiredRole } from '@/lib/core/session';
 import React from 'react';
 
-const OwnerLayout = ({children}) => {
-    getRequiredRole("owner")
+const OwnerLayout = async({children}) => {
+    await getRequiredRole("owner")
     return (
         <div>
             {children}
