@@ -16,6 +16,11 @@ import {
   ArrowUpDown,
   Grid3x3,
   List,
+  Building2,
+  Warehouse,
+  Home as HomeIcon,
+  Building,
+  Trees,
 } from "lucide-react";
 import {
   Input,
@@ -67,7 +72,7 @@ export default function PropertiesClient({ properties = [], filter, total }) {
     sp.set("page", String(page));
     sp.set("perPage", String(itemsPerPage));
     router.push(`?${sp.toString()}`);
-  }, [searchTerm, propertyType, sortBy, page]);
+  }, [searchTerm, propertyType, sortBy, page, router]);
 
   useEffect(() => {
     setPage(1);
@@ -161,6 +166,31 @@ export default function PropertiesClient({ properties = [], filter, total }) {
     return stars;
   };
 
+  // ========== PROPERTY TYPE ICONS ==========
+  const getPropertyTypeIcon = (type) => {
+    const icons = {
+      apartment: Building2,
+      house: HomeIcon,
+      villa: Warehouse,
+      studio: Building,
+      condo: HomeIcon,
+      townhouse: Trees,
+    };
+    return icons[type] || Building2;
+  };
+
+  const getPropertyTypeColor = (type) => {
+    const colors = {
+      apartment: "bg-blue-100 text-blue-700 border-blue-200",
+      house: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      villa: "bg-purple-100 text-purple-700 border-purple-200",
+      studio: "bg-amber-100 text-amber-700 border-amber-200",
+      condo: "bg-cyan-100 text-cyan-700 border-cyan-200",
+      townhouse: "bg-rose-100 text-rose-700 border-rose-200",
+    };
+    return colors[type] || "bg-gray-100 text-gray-700 border-gray-200";
+  };
+
   // ========== PROPERTY TYPES ==========
   const propertyTypes = [
     { id: "all", label: "All Types" },
@@ -181,6 +211,10 @@ export default function PropertiesClient({ properties = [], filter, total }) {
   // ========== PROPERTY CARD COMPONENT ==========
   const PropertyCard = ({ property, isWishlisted }) => {
     const isListView = viewMode === "list";
+    const TypeIcon = getPropertyTypeIcon(property.propertyType);
+    const typeColor = getPropertyTypeColor(property.propertyType);
+    const typeLabel = propertyTypes.find(t => t.id === property.propertyType)?.label || property.propertyType;
+
     return (
       <div
         className={`group bg-white rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-400 border-2 border-gray-100/60 hover:border-blue-200/70 hover:-translate-y-2 ${
@@ -198,6 +232,12 @@ export default function PropertiesClient({ properties = [], filter, total }) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent" />
+          </div>
+
+          {/* Property Type Badge - Unique Design */}
+          <div className={`absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 backdrop-blur-sm shadow-md ${typeColor}`}>
+            <TypeIcon className="w-3.5 h-3.5" strokeWidth={2} />
+            <span className="text-xs font-semibold uppercase tracking-wider">{typeLabel}</span>
           </div>
 
           {/* Price Badge */}
@@ -325,7 +365,7 @@ export default function PropertiesClient({ properties = [], filter, total }) {
       <section className="py-8 bg-white border-y border-gray-100/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-4 items-center">
-            {/* Search Input - With visible search icon */}
+            {/* Search Input */}
             <div className="w-full md:flex-1">
               <Input
                 placeholder="Search by location, property title..."
