@@ -39,11 +39,22 @@ import {
   AlertCircle,
   Send,
   Share2,
-  Bookmark,
   X,
   ChevronLeft,
   ChevronRight,
+  Copy,
+  Check,
+  Link2,
 } from "lucide-react";
+import {
+  FaFacebook,
+  FaTwitter,
+  FaLinkedin,
+  FaEnvelope,
+  FaWhatsapp,
+  FaTelegram,
+  FaPinterest,
+} from "react-icons/fa";
 import { toast } from "react-toastify";
 
 // ==================== PROPERTY DETAILS CLIENT ====================
@@ -57,9 +68,17 @@ export default function PropertyDetailsClient({ property, initialReviews = [] })
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // All images array
   const allImages = property?.images ? [property.mainImage, ...property.images] : [property?.mainImage];
+
+  // Share URL
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareTitle = property?.title || 'Check out this property';
+  const shareDescription = property?.description || 'Amazing property available for rent';
+  const shareImage = property?.mainImage || '';
 
   // ========== PROPERTY TYPE ICON ==========
   const getPropertyTypeIcon = (type) => {
@@ -135,27 +154,88 @@ export default function PropertyDetailsClient({ property, initialReviews = [] })
     return stars;
   };
 
+  // ========== SHARE HANDLERS ==========
+  const shareLinks = [
+    {
+      name: "Copy Link",
+      icon: Copy,
+      color: "bg-gray-100 text-gray-700 hover:bg-gray-200",
+      action: () => {
+        navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        toast.success("Link copied to clipboard!");
+        setTimeout(() => setCopied(false), 3000);
+      }
+    },
+    {
+      name: "Facebook",
+      icon: FaFacebook,
+      color: "bg-[#1877f2] text-white hover:bg-[#166fe5]",
+      action: () => {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareTitle)}`, '_blank', 'width=600,height=400');
+      }
+    },
+    {
+      name: "Twitter",
+      icon: FaTwitter,
+      color: "bg-[#1da1f2] text-white hover:bg-[#1a8cd8]",
+      action: () => {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
+      }
+    },
+    {
+      name: "LinkedIn",
+      icon: FaLinkedin,
+      color: "bg-[#0a66c2] text-white hover:bg-[#0957a8]",
+      action: () => {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
+      }
+    },
+    {
+      name: "WhatsApp",
+      icon: FaWhatsapp,
+      color: "bg-[#25D366] text-white hover:bg-[#1da851]",
+      action: () => {
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareTitle + ' - ' + shareUrl)}`, '_blank', 'width=600,height=400');
+      }
+    },
+    {
+      name: "Telegram",
+      icon: FaTelegram,
+      color: "bg-[#0088cc] text-white hover:bg-[#0077b6]",
+      action: () => {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`, '_blank', 'width=600,height=400');
+      }
+    },
+    {
+      name: "Pinterest",
+      icon: FaPinterest,
+      color: "bg-[#E60023] text-white hover:bg-[#cc001f]",
+      action: () => {
+        window.open(`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=${encodeURIComponent(shareImage)}&description=${encodeURIComponent(shareTitle)}`, '_blank', 'width=600,height=400');
+      }
+    },
+    {
+      name: "Email",
+      icon: FaEnvelope,
+      color: "bg-gray-700 text-white hover:bg-gray-800",
+      action: () => {
+        const subject = `Check out this property: ${shareTitle}`;
+        const body = `${shareTitle}\n\n${shareDescription}\n\nView property: ${shareUrl}`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      }
+    },
+  ];
+
   // ========== WISHLIST HANDLERS ==========
   const handleAddToWishlist = async () => {
     setIsWishlistLoading(true);
     try {
-      // ========== AFTER API INTEGRATION: ==========
-      // const response = await fetch('/api/wishlist', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ propertyId: property._id }),
-      // });
-      // if (!response.ok) throw new Error('Failed to add to wishlist');
-      // const data = await response.json();
-      
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500));
-      
       setIsWishlisted(true);
       toast.success("Added to wishlist!");
     } catch (error) {
       toast.error("Failed to add to wishlist");
-      console.error("Error adding to wishlist:", error);
     } finally {
       setIsWishlistLoading(false);
     }
@@ -164,21 +244,11 @@ export default function PropertyDetailsClient({ property, initialReviews = [] })
   const handleRemoveFromWishlist = async () => {
     setIsWishlistLoading(true);
     try {
-      // ========== AFTER API INTEGRATION: ==========
-      // const response = await fetch(`/api/wishlist/${property._id}`, {
-      //   method: 'DELETE',
-      // });
-      // if (!response.ok) throw new Error('Failed to remove from wishlist');
-      // const data = await response.json();
-      
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500));
-      
       setIsWishlisted(false);
       toast.success("Removed from wishlist!");
     } catch (error) {
       toast.error("Failed to remove from wishlist");
-      console.error("Error removing from wishlist:", error);
     } finally {
       setIsWishlistLoading(false);
     }
@@ -207,7 +277,6 @@ export default function PropertyDetailsClient({ property, initialReviews = [] })
 
     setIsSubmittingReview(true);
     try {
-      // Simulate API call - Replace with actual API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
       
       const newReview = {
@@ -502,7 +571,10 @@ export default function PropertyDetailsClient({ property, initialReviews = [] })
               </button>
 
               <div className="flex gap-2">
-                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
+                <button 
+                  onClick={() => setIsShareModalOpen(true)}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
+                >
                   <Share2 className="w-4 h-4" strokeWidth={2} />
                   Share
                 </button>
@@ -650,6 +722,59 @@ export default function PropertyDetailsClient({ property, initialReviews = [] })
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center" onClick={() => setIsShareModalOpen(false)}>
+          <div className="bg-white rounded-2xl max-w-md w-full mx-4 p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Share Property</h3>
+              <button
+                onClick={() => setIsShareModalOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {shareLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.name}
+                    onClick={item.action}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${item.color}`}
+                  >
+                    {item.name === "Copy Link" && copied ? (
+                      <Check className="w-5 h-5" />
+                    ) : (
+                      <Icon className="w-5 h-5" />
+                    )}
+                    <span className="text-sm font-medium">{item.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl">
+                <Link2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <p className="text-xs text-gray-500 truncate flex-1">{shareUrl}</p>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(shareUrl);
+                    toast.success("Link copied!");
+                  }}
+                  className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  <Copy className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Image Modal */}
       {isImageModalOpen && (
