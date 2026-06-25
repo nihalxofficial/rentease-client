@@ -1,4 +1,3 @@
-// src/app/properties/[id]/PropertyDetailsClient.jsx
 "use client";
 
 import { useState } from "react";
@@ -59,11 +58,11 @@ import { toast } from "react-toastify";
 import { addReview } from "@/lib/action/reviews";
 
 // ==================== PROPERTY DETAILS CLIENT ====================
-export default function PropertyDetailsClient({ property, initialReviews = [], tenant, propertyId }) {
+export default function PropertyDetailsClient({ property, reviews: initialReviews = [], tenant, propertyId }) {
   const router = useRouter();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
-  const [reviews, setReviews] = useState(initialReviews);
+  const [reviews, setReviews] = useState(initialReviews); // State for reviews
   const [selectedRating, setSelectedRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
@@ -280,25 +279,30 @@ export default function PropertyDetailsClient({ property, initialReviews = [], t
     try {
       const newReview = {
         tenantId: tenant?.id,
-        propertyId : propertyId,
+        propertyId: propertyId,
         rating: selectedRating,
         comment: reviewComment.trim(),
       };
 
       const result = await addReview(newReview, propertyId);
       
-      // Add the new review to the list with the proper structure
-      const reviewWithUser = {
-        ...result,
+      // Create the review object with tenant data for immediate display
+      const reviewWithTenant = {
+        _id: result?.data?._id || Date.now(),
+        rating: selectedRating,
+        comment: reviewComment.trim(),
+        createdAt: new Date().toISOString(),
         tenant: {
-          _id: tenant?.id,
-          name: tenant?.name || "You",
+          _id: tenant?.id || 'temp',
+          name: tenant?.name || 'You',
           email: tenant?.email,
           image: tenant?.image || null,
         }
       };
       
-      setReviews([reviewWithUser, ...reviews]);
+      // Update reviews state immediately
+      setReviews([reviewWithTenant, ...reviews]);
+      
       setSelectedRating(0);
       setReviewComment("");
       toast.success("Review submitted successfully!");
@@ -687,7 +691,7 @@ export default function PropertyDetailsClient({ property, initialReviews = [], t
             </form>
           </div>
 
-          {/* Reviews List - Using real data structure */}
+          {/* Reviews List - Uses reviews state */}
           <div className="space-y-4">
             {reviews.map((review) => (
               <div

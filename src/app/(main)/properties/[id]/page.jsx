@@ -13,7 +13,7 @@ export default async function PropertyDetailsPage({ params }) {
   return (
     <PropertyDetailsClient 
       property={propertyDetails} 
-      initialReviews={reviews}
+      reviews={reviews}
       tenant={user}
       propertyId={id}
     />
