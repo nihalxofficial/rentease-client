@@ -30,14 +30,17 @@ export const serverFetch = async (path, requireAuth = false) => {
 
 export const serverMutation = async (path, data="", method = "POST") => {
     const token = await getToken()
-    const res = await fetch(`${Api}${path}`, {
-        method: method,
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        },
-        body: data ? JSON.stringify(data) : undefined,
-    })
-
-    return handleResponse(res);
+    try {
+        const res = await fetch(`${Api}${path}`, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: data ? JSON.stringify(data) : undefined,
+        })
+        return handleResponse(res);
+    } catch(err) {
+        console.error("fetch failed:", err.message)
+    }
 }

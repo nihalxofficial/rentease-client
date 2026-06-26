@@ -30,7 +30,6 @@ export default function BookingModal({
     property,
     tenant,
     propertyId,
-    onBookingSuccess,
 }) {
     const [isLoading, setIsLoading] = useState(false);
     const [bookingData, setBookingData] = useState({
@@ -68,57 +67,6 @@ export default function BookingModal({
         });
     };
 
-    const handleSubmit = async () => {
-        // Validate required fields
-        if (!bookingData.moveInDate) {
-            toast.error("Please select a move-in date");
-            return;
-        }
-        if (!bookingData.contactNumber) {
-            toast.error("Please enter your contact number");
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            // Prepare booking data
-            const bookingPayload = {
-                propertyId: propertyId,
-                tenantId: tenant?.id,
-                propertyTitle: property?.title,
-                propertyPrice: property?.price,
-                moveInDate: bookingData.moveInDate.toString(),
-                contactNumber: bookingData.contactNumber,
-                fullName: bookingData.fullName || tenant?.name,
-                email: bookingData.email || tenant?.email,
-                additionalNotes: bookingData.additionalNotes,
-                status: "pending",
-                createdAt: new Date().toISOString(),
-            };
-
-            console.log("Booking Data:", bookingPayload);
-
-            // Here you would call your API to create booking
-            // const result = await createBooking(bookingPayload);
-
-            // Close modal
-            onClose();
-            resetForm();
-
-            // Call success callback with booking data
-            if (onBookingSuccess) {
-                onBookingSuccess(bookingPayload);
-            }
-
-            toast.success("Booking initiated! Redirecting to payment...");
-        } catch (error) {
-            toast.error("Failed to book property. Please try again.");
-            console.error("Booking error:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const handleClose = () => {
         onClose();
         resetForm();
@@ -127,6 +75,8 @@ export default function BookingModal({
     // Get today's date
     const currentDate = today(getLocalTimeZone());
     const isInvalid = bookingData.moveInDate != null && bookingData.moveInDate.compare(currentDate) < 0;
+    const isFormValid = bookingData.moveInDate && bookingData.contactNumber;
+
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose} size="lg" className="max-w-lg">
@@ -176,7 +126,7 @@ export default function BookingModal({
                                 onChange={handleDateChange}
                             >
                                 <Label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Move-in Date *
+                                    Move-in Date
                                 </Label>
                                 <DateField.Group fullWidth>
                                     <DateField.Input>
@@ -239,10 +189,11 @@ export default function BookingModal({
 
                             {/* Contact Number */}
                             <div>
-                                <Label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Contact Number *
+                                <Label isRequired className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Contact Number
                                 </Label>
                                 <Input
+                                    isRequired
                                     type="tel"
                                     name="contactNumber"
                                     value={bookingData.contactNumber}
@@ -264,9 +215,10 @@ export default function BookingModal({
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <Label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                        Full Name *
+                                        Full Name
                                     </Label>
                                     <Input
+                                        isRequired
                                         type="text"
                                         name="fullName"
                                         value={bookingData.fullName || tenant?.name || ""}
@@ -288,6 +240,7 @@ export default function BookingModal({
                                         Email
                                     </Label>
                                     <Input
+                                        isRequired
                                         type="email"
                                         name="email"
                                         value={bookingData.email || tenant?.email || ""}
@@ -325,6 +278,14 @@ export default function BookingModal({
                                     }}
                                 />
                             </div>
+
+                            {/* Payment Summary */}
+                            <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <CreditCard className="w-3.5 h-3.5" strokeWidth={2} />
+                                    <span>Secure payment powered by Stripe</span>
+                                </div>
+                            </div>
                         </Modal.Body>
 
                         {/* Footer */}
@@ -335,23 +296,31 @@ export default function BookingModal({
                             >
                                 Cancel
                             </Button>
-                            <Button
-                                onPress={handleSubmit}
-                                isDisabled={isLoading}
-                                className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.45)] transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        <span>Processing...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <CreditCard className="w-4 h-4" strokeWidth={2} />
-                                        <span>Continue to Payment</span>
-                                    </>
-                                )}
-                            </Button>
+
+                            <form action="/api/payment" method="POST" className="flex-1">
+                                {/* Hidden inputs to send booking data */}
+                                <input type="hidden" name="propertyId" value={propertyId} />
+                                <input type="hidden" name="propertyTitle" value={property?.title} />
+                                <input type="hidden" name="propertyPrice" value={property?.price} />
+                                <input type="hidden" name="tenantId" value={tenant?.id} />
+                                <input type="hidden" name="tenantName" value={tenant?.name} />
+                                <input type="hidden" name="tenantEmail" value={tenant?.email} />
+                                <input type="hidden" name="moveInDate" value={bookingData.moveInDate?.toString() || ""} />
+                                <input type="hidden" name="contactNumber" value={bookingData.contactNumber} />
+                                <input type="hidden" name="fullName" value={bookingData.fullName || tenant?.name || ""} />
+                                <input type="hidden" name="email" value={bookingData.email || tenant?.email || ""} />
+                                <input type="hidden" name="additionalNotes" value={bookingData.additionalNotes} />
+                                <input type="hidden" name="amount" value={property?.price} />
+
+                                <Button
+                                    type="submit"
+                                    isDisabled={!isFormValid}
+                                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.45)] transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
+                                >
+                                    <CreditCard className="w-4 h-4" strokeWidth={2} />
+                                    <span>Pay & Confirm Booking</span>
+                                </Button>
+                            </form>
                         </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>

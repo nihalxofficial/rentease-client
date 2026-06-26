@@ -295,11 +295,6 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
     setIsBookingModalOpen(true);
   };
 
-  const handleBookingSuccess = (bookingData) => {
-    // Redirect to payment page with booking data
-    router.push(`/payment?propertyId=${propertyId}&amount=${property.price}&bookingData=${encodeURIComponent(JSON.stringify(bookingData))}`);
-  };
-
   // ========== REVIEW HANDLERS ==========
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -879,7 +874,6 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
         property={property}
         tenant={tenant}
         propertyId={propertyId}
-        onBookingSuccess={handleBookingSuccess}
       />
     </>
   );
