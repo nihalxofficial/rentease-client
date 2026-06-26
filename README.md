@@ -17,6 +17,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - MongoDB Atlas
 - React Toast
 - Recharts
+- Stripe
+
 
 First, run the development server:
 

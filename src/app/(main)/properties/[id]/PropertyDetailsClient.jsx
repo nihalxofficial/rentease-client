@@ -72,6 +72,9 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Check if user is tenant
+  const isTenant = tenant?.role === "tenant";
+
   // All images array
   const allImages = property?.images ? [property.mainImage, ...property.images] : [property?.mainImage];
 
@@ -230,9 +233,15 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
 
   // ========== WISHLIST HANDLERS ==========
   const handleAddToWishlist = async () => {
+    // Only tenants can add to wishlist
+    if (!isTenant) {
+      toast.error("Only tenants can add properties to wishlist");
+      router.push("/unauthorized");
+      return;
+    }
+
     setIsWishlistLoading(true);
     try {
-      // await new Promise((resolve) => setTimeout(resolve, 500));
       const wish = {
         propertyId: propertyId,
         tenantId: tenant?.id,
@@ -248,13 +257,17 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
   };
 
   const handleRemoveFromWishlist = async () => {
-    setIsWishlistLoading(true);
+    // Only tenants can remove from wishlist
+    if (!isTenant) {
+      toast.error("Only tenants can remove properties from wishlist");
+      router.push("/unauthorized");
+      return;
+    }
 
+    setIsWishlistLoading(true);
     try {
       await removeWishlist(propertyId, tenant?.id);
-
       setIsWishlisted(false);
-
       toast.success("Removed from wishlist!");
     } catch (error) {
       toast.error("Failed to remove from wishlist");
@@ -271,9 +284,29 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
     }
   };
 
+  // ========== BOOKING HANDLER ==========
+  const handleBooking = () => {
+    // Only tenants can book properties
+    if (!isTenant) {
+      toast.error("Only tenants can book properties");
+      router.push("/unauthorized");
+      return;
+    }
+
+    // Navigate to booking page
+    router.push(`/properties/${propertyId}/book`);
+  };
+
   // ========== REVIEW HANDLERS ==========
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+
+    // Only tenants can submit reviews
+    if (!isTenant) {
+      toast.error("Only tenants can submit reviews");
+      router.push("/unauthorized");
+      return;
+    }
 
     if (selectedRating === 0) {
       toast.error("Please select a rating");
@@ -584,9 +617,13 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
 
             {/* Action Buttons */}
             <div className="space-y-2 pt-2">
-              <button className="w-full px-6 py-3 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.45)] transition-all duration-300 hover:-translate-y-1 flex items-center justify-center gap-2">
+              {/* Book Property Button */}
+              <button 
+                onClick={handleBooking}
+                className="w-full px-6 py-3 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.45)] transition-all duration-300 hover:-translate-y-1 flex items-center justify-center gap-2"
+              >
                 <Calendar className="w-4 h-4" strokeWidth={2} />
-                <span>Book Property</span>
+                <span>{isTenant ? "Book Property" : "Only Tenants Can Book"}</span>
               </button>
 
               <div className="flex gap-2">
@@ -628,71 +665,79 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
             </div>
           </div>
 
-          {/* Review Form */}
-          <div className="bg-white rounded-2xl p-5 border-2 border-blue-100/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] mb-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-3">Write a Review</h3>
-            <form onSubmit={handleSubmitReview}>
-              <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Rating *
-                </label>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setSelectedRating(star)}
-                      className="cursor-pointer focus:outline-none"
-                    >
-                      <Star
-                        className={`w-7 h-7 transition-colors ${star <= selectedRating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-200 hover:text-gray-300"
-                          }`}
-                        strokeWidth={1.5}
-                      />
-                    </button>
-                  ))}
+          {/* Review Form - Only show for tenants */}
+          {isTenant ? (
+            <div className="bg-white rounded-2xl p-5 border-2 border-blue-100/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] mb-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-3">Write a Review</h3>
+              <form onSubmit={handleSubmitReview}>
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Rating *
+                  </label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setSelectedRating(star)}
+                        className="cursor-pointer focus:outline-none"
+                      >
+                        <Star
+                          className={`w-7 h-7 transition-colors ${star <= selectedRating
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-200 hover:text-gray-300"
+                            }`}
+                          strokeWidth={1.5}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  {selectedRating > 0 && (
+                    <p className="text-sm text-blue-600 mt-1">
+                      You selected {selectedRating} star{selectedRating > 1 ? 's' : ''}
+                    </p>
+                  )}
                 </div>
-                {selectedRating > 0 && (
-                  <p className="text-sm text-blue-600 mt-1">
-                    You selected {selectedRating} star{selectedRating > 1 ? 's' : ''}
-                  </p>
-                )}
-              </div>
 
-              <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Your Review *
-                </label>
-                <textarea
-                  value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder="Share your experience with this property..."
-                  rows={3}
-                  className="w-full px-4 py-2.5 bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 text-gray-800 placeholder:text-gray-400 shadow-sm hover:border-blue-300 resize-none text-sm"
-                />
-              </div>
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Your Review *
+                  </label>
+                  <textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="Share your experience with this property..."
+                    rows={3}
+                    className="w-full px-4 py-2.5 bg-gray-50/80 border-2 border-blue-100/50 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 text-gray-800 placeholder:text-gray-400 shadow-sm hover:border-blue-300 resize-none text-sm"
+                  />
+                </div>
 
-              <button
-                type="submit"
-                disabled={isSubmittingReview}
-                className="px-5 cursor-pointer py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.25)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.35)] transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
-              >
-                {isSubmittingReview ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Submitting...</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" strokeWidth={2} />
-                    <span>Submit Review</span>
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
+                <button
+                  type="submit"
+                  disabled={isSubmittingReview}
+                  className="px-5 cursor-pointer py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.25)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.35)] transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
+                >
+                  {isSubmittingReview ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" strokeWidth={2} />
+                      <span>Submit Review</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="bg-amber-50 rounded-2xl p-5 border-2 border-amber-200/50 mb-6 text-center">
+              <p className="text-amber-700 text-sm font-medium">
+                Only tenants can submit reviews. Please switch to a tenant account.
+              </p>
+            </div>
+          )}
 
           {/* Reviews List - Uses reviews state */}
           <div className="space-y-4">
