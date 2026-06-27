@@ -14,6 +14,7 @@ export async function POST(request) {
     const price = formData.get("propertyPrice");
     const title = formData.get("propertyTitle");
     const propertyId = formData.get("propertyId");
+    const ownerId = formData.get("ownerId");
     const moveInDate = formData.get("moveInDate");
     const contactNumber = formData.get("contactNumber");
     const additionalNotes = formData.get("additionalNotes");
@@ -34,6 +35,7 @@ export async function POST(request) {
       ],
       metadata: {
         propertyId,
+        ownerId,
         price: Number(price),
         userId: user?.id,
         userRole: user?.role,

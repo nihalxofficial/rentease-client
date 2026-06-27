@@ -11,7 +11,7 @@ export default async function Success({ searchParams }) {
   const user = await getUserSession();
 
   if (!session_id) {
-    throw new Error('Please provide a valid session_id (`cs_test_...`)');
+    redirect("/properties")
   }
 
   const {

@@ -302,6 +302,7 @@ export default function BookingModal({
                                 <input type="hidden" name="propertyId" value={propertyId} />
                                 <input type="hidden" name="propertyTitle" value={property?.title} />
                                 <input type="hidden" name="propertyPrice" value={property?.price} />
+                                <input type="hidden" name="ownerId" value={property?.ownerId} />
                                 <input type="hidden" name="tenantId" value={tenant?.id} />
                                 <input type="hidden" name="tenantName" value={tenant?.name} />
                                 <input type="hidden" name="tenantEmail" value={tenant?.email} />
