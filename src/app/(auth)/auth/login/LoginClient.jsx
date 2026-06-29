@@ -67,13 +67,15 @@ export default function LoginClient() {
 
   const handleDiscordLogin = async()=>{
     const data = await authClient.signIn.social({
-        provider: "discord"
+        provider: "discord",
+        callbackURL: redirectTo
     })
   }
 
   const handleGoogleLogin = async()=>{
     const data = await authClient.signIn.social({
-        provider: "google"
+        provider: "google",
+        callbackURL: redirectTo
     })
   }
 

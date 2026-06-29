@@ -7,6 +7,7 @@ const client = new MongoClient(process.env.MONGO_URI);
 const db = client.db("rentease_db");
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
   database: mongodbAdapter(db, {
     client,
   }),
@@ -37,5 +38,15 @@ export const auth = betterAuth({
             clientId: process.env.DISCORD_CLIENT_ID, 
             clientSecret: process.env.DISCORD_CLIENT_SECRET, 
         }, 
+        google: { 
+            clientId: process.env.GOOGLE_CLIENT_ID , 
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET, 
+        }, 
     },
+    account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "email-password"], // add all your providers
+    },
+  },
 });
