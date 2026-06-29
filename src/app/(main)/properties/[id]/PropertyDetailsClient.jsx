@@ -44,6 +44,8 @@ import {
   Copy,
   Check,
   Link2,
+  Home as HomeIcon,
+  Search,
 } from "lucide-react";
 import {
   FaFacebook,
@@ -59,6 +61,60 @@ import { addReview } from "@/lib/action/reviews";
 import { addToWishlist, removeWishlist } from "@/lib/action/wishlist";
 import BookingModal from "./BookingModal";
 import { TextArea } from "@heroui/react";
+
+// ==================== PROPERTY NOT FOUND COMPONENT ====================
+function PropertyNotFound() {
+  const router = useRouter();
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50/50 via-white to-white flex items-center justify-center px-4">
+      <div className="relative max-w-lg w-full mx-auto text-center">
+        {/* Background Decoration */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+        
+        <div className="relative z-10">
+          {/* Icon */}
+          <div className="w-24 h-24 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border-2 border-blue-100/50 shadow-lg">
+            <AlertCircle className="w-12 h-12 text-blue-400" strokeWidth={1.5} />
+          </div>
+          
+          {/* Title */}
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
+            Property Not Found
+          </h1>
+          
+          {/* Description */}
+          <p className="text-gray-500 text-base mb-8 max-w-sm mx-auto">
+            The property you&apos;re looking for doesn&apos;t exist or may have been removed.
+          </p>
+          
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex cursor-pointer items-center gap-2 px-6 py-3 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 w-full sm:w-auto justify-center"
+            >
+              <ArrowLeft className="w-4 h-4" strokeWidth={2.5} />
+              <span>Go Back</span>
+            </button>
+            <Link
+              href="/properties"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.45)] transition-all duration-300 hover:-translate-y-1 w-full sm:w-auto justify-center"
+            >
+              <Search className="w-4 h-4" strokeWidth={2.5} />
+              <span>Browse Properties</span>
+            </Link>
+          </div>
+          
+          {/* Help Text */}
+          <p className="mt-6 text-xs text-gray-400">
+            Need help? <Link href="/contact" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">Contact Support</Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ==================== PROPERTY DETAILS CLIENT ====================
 export default function PropertyDetailsClient({ property, reviews: initialReviews = [], tenant, propertyId, wishlistStatus = false }) {
@@ -77,6 +133,11 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
 
   // Check if user is tenant
   const isTenant = tenant?.role === "tenant";
+
+  // If property not found, show the PropertyNotFound component
+  if (!property) {
+    return <PropertyNotFound />;
+  }
 
   // All images array
   const allImages = property?.images ? [property.mainImage, ...property.images] : [property?.mainImage];
@@ -383,22 +444,6 @@ export default function PropertyDetailsClient({ property, reviews: initialReview
     : 0;
 
   const TypeIcon = getPropertyTypeIcon(property?.propertyType);
-
-  if (!property) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900">Property not found</h3>
-          <p className="text-gray-500">The property you're looking for doesn't exist.</p>
-          <Link href="/properties" className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Properties
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
