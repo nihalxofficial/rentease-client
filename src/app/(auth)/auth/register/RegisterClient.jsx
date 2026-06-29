@@ -90,19 +90,19 @@ export default function RegisterClient() {
     return null;
   };
 
-   const handleDiscordLogin = async()=>{
-      const data = await authClient.signIn.social({
-          provider: "discord",
-          callbackURL: redirectTo
-      })
-    }
-  
-    const handleGoogleLogin = async()=>{
-      const data = await authClient.signIn.social({
-          provider: "google",
-          callbackURL: redirectTo
-      })
-    }
+  const handleDiscordLogin = async () => {
+    const data = await authClient.signIn.social({
+      provider: "discord",
+      callbackURL: redirectTo
+    })
+  }
+
+  const handleGoogleLogin = async () => {
+    const data = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: redirectTo
+    })
+  }
 
   const features = [
     { icon: Shield, text: "Secure & Encrypted" },
@@ -454,11 +454,12 @@ export default function RegisterClient() {
                 <span className="text-sm font-medium text-gray-700">Google</span>
               </Button>
               {/* <Button
+                onClick={handleDiscordLogin}
                 variant="secondary"
                 className="flex-1 cursor-pointer bg-gray-50 border-2 border-gray-200 rounded-xl py-3 hover:bg-gray-100 transition-colors"
               >
-                <span className="text-lg font-bold text-blue-600">f</span>
-                <span className="text-sm font-medium text-gray-700">Facebook</span>
+                <span className="text-lg font-bold text-blue-600">D</span>
+                <span className="text-sm font-medium text-gray-700">Discord</span>
               </Button> */}
             </div>
           </div>

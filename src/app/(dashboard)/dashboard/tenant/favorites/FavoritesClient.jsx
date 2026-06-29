@@ -36,9 +36,6 @@ export default function FavoritesClient({
   const [properties, setProperties] = useState(initialProperties);
   const [removingId, setRemovingId] = useState(null);
 
-  // Debug log
-  console.log("FavoritesClient received properties:", properties);
-
   // ========== FILTERED PROPERTIES ==========
   const filteredProperties = properties.filter((property) => {
     const matchesSearch = property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -78,7 +75,7 @@ export default function FavoritesClient({
     try {
       await removeWishlist(propertyId, userId);
       setProperties((prev) => prev.filter((p) => p._id !== propertyId));
-      toast.success("Removed from wishlist!");
+      toast.success("Removed from favorites!");
     } catch (error) {
       console.error("Error removing favorite:", error);
       toast.error("Failed to remove from favorites. Please try again.");
@@ -178,7 +175,21 @@ export default function FavoritesClient({
         })}
       </div>
 
-      {/* Favorites Grid */}
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" strokeWidth={2} />
+          <input
+            type="text"
+            placeholder="Search favorites..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 bg-white border-2 border-blue-100/50 rounded-xl focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all duration-200 text-sm shadow-sm hover:border-rose-300"
+          />
+        </div>
+      </div>
+
+      {/* Favorites Table */}
       {filteredProperties.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center border-2 border-blue-100/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
           <div className="w-20 h-20 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -202,131 +213,141 @@ export default function FavoritesClient({
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property, index) => {
-              const rating = property.rating || 0;
-              const reviewCount = property.reviewCount || 0;
-              const isRemoving = removingId === property._id;
+          <div className="bg-white rounded-2xl border-2 border-blue-100/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(37,99,235,0.06)] transition-all duration-300 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Property</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Location</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Details</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProperties.map((property, index) => {
+                    const rating = property.rating || 0;
+                    const reviewCount = property.reviewCount || 0;
+                    const isRemoving = removingId === property._id;
 
-              return (
-                <motion.div
-                  key={property._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  whileHover={{ y: -4 }}
-                  className="group bg-white rounded-2xl overflow-hidden border-2 border-blue-100/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(37,99,235,0.08)] transition-all duration-300"
-                >
-                  {/* Image */}
-                  <div className="relative h-48 overflow-hidden">
-                    <Image
-                      src={property.mainImage || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"}
-                      alt={property.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                    
-                    {/* Rating Badge */}
-                    {reviewCount > 0 && (
-                      <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-black/50 backdrop-blur-sm rounded-full border border-white/10">
-                        <div className="flex items-center gap-0.5">
-                          {renderStars(rating)}
-                        </div>
-                        <span className="text-white text-xs font-medium">{rating.toFixed(1)}</span>
-                        <span className="text-white/60 text-[10px]">({reviewCount})</span>
-                      </div>
-                    )}
-
-                    {/* Price Badge */}
-                    <div className="absolute bottom-3 right-3 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-white/50">
-                      <span className="text-sm font-bold text-blue-600">{formatPrice(property.price)}</span>
-                      <span className="text-[10px] text-gray-500 ml-1">/{property.rentType || "mo"}</span>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-4">
-                    {/* Title & Location */}
-                    <div className="mb-2">
-                      <h3 className="text-sm font-bold text-gray-900 group-hover:text-rose-600 transition-colors line-clamp-1">
-                        {property.title}
-                      </h3>
-                      <p className="text-gray-500 text-xs flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3 h-3 text-gray-400" strokeWidth={2} />
-                        {property.location}
-                      </p>
-                    </div>
-
-                    {/* Property Details */}
-                    <div className="flex items-center gap-3 py-2 border-t border-b border-gray-100/60 text-xs text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Bed className="w-3.5 h-3.5 text-blue-400" strokeWidth={2} />
-                        <span>{property.bedrooms || 0}</span>
-                      </div>
-                      <div className="w-px h-4 bg-gray-200" />
-                      <div className="flex items-center gap-1">
-                        <Bath className="w-3.5 h-3.5 text-blue-400" strokeWidth={2} />
-                        <span>{property.bathrooms || 0}</span>
-                      </div>
-                      <div className="w-px h-4 bg-gray-200" />
-                      <div className="flex items-center gap-1">
-                        <Ruler className="w-3.5 h-3.5 text-blue-400" strokeWidth={2} />
-                        <span>{property.propertySize || 0} sqft</span>
-                      </div>
-                    </div>
-
-                    {/* Amenities Preview */}
-                    {property.amenities && property.amenities.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {property.amenities.slice(0, 2).map((amenity) => (
-                          <span
-                            key={amenity}
-                            className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded-full border border-blue-100"
-                          >
-                            {amenity}
-                          </span>
-                        ))}
-                        {property.amenities.length > 2 && (
-                          <span className="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] rounded-full border border-gray-200">
-                            +{property.amenities.length - 2} more
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2 mt-3">
-                      <Link
-                        href={`/properties/${property._id}`}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-semibold rounded-xl shadow-[0_4px_14px_rgba(37,99,235,0.25)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.35)] transition-all duration-200 hover:-translate-y-0.5"
+                    return (
+                      <motion.tr
+                        key={property._id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.03 }}
+                        className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
                       >
-                        <Eye className="w-3.5 h-3.5" strokeWidth={2} />
-                        <span>View Details</span>
-                      </Link>
-                      <button
-                        onClick={() => handleRemoveFavorite(property._id)}
-                        disabled={isRemoving}
-                        className={`px-3 py-2 cursor-pointer bg-rose-50 text-rose-600 text-xs font-semibold rounded-xl border border-rose-200 hover:bg-rose-100 transition-all duration-200 flex items-center gap-1.5 ${
-                          isRemoving ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                      >
-                        {isRemoving ? (
-                          <div className="w-3.5 h-3.5 border-2 border-rose-600 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Trash2 className="w-3.5 h-3.5" strokeWidth={2} />
-                        )}
-                        <span>Remove</span>
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+                        {/* Property */}
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-3">
+                            <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                              {property.mainImage ? (
+                                <Image src={property.mainImage} alt={property.title} fill className="object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                  <Home className="w-5 h-5" strokeWidth={2} />
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900 text-sm line-clamp-1">{property.title}</p>
+                              <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                                <span className="flex items-center gap-0.5">
+                                  <Bed className="w-3 h-3" strokeWidth={2} />
+                                  {property.bedrooms || 0}
+                                </span>
+                                <span className="flex items-center gap-0.5">
+                                  <Bath className="w-3 h-3" strokeWidth={2} />
+                                  {property.bathrooms || 0}
+                                </span>
+                                <span className="flex items-center gap-0.5">
+                                  <Ruler className="w-3 h-3" strokeWidth={2} />
+                                  {property.propertySize || 0} sqft
+                                </span>
+                              </div>
+                              {reviewCount > 0 && (
+                                <div className="flex items-center gap-0.5 mt-0.5">
+                                  {renderStars(rating)}
+                                  <span className="text-xs text-gray-500 ml-1">({reviewCount})</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Location */}
+                        <td className="py-3 px-4 hidden md:table-cell">
+                          <div className="flex items-center gap-1 text-sm text-gray-500">
+                            <MapPin className="w-3.5 h-3.5 text-gray-400" strokeWidth={2} />
+                            {property.location}
+                          </div>
+                        </td>
+
+                        {/* Price */}
+                        <td className="py-3 px-4">
+                          <p className="text-sm font-semibold text-gray-900">{formatPrice(property.price)}</p>
+                          <p className="text-[10px] text-gray-400">/{property.rentType || "mo"}</p>
+                        </td>
+
+                        {/* Details */}
+                        <td className="py-3 px-4 hidden sm:table-cell">
+                          {property.amenities && property.amenities.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {property.amenities.slice(0, 2).map((amenity) => (
+                                <span
+                                  key={amenity}
+                                  className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded-full border border-blue-100"
+                                >
+                                  {amenity}
+                                </span>
+                              ))}
+                              {property.amenities.length > 2 && (
+                                <span className="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] rounded-full border border-gray-200">
+                                  +{property.amenities.length - 2}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-1">
+                            <Link
+                              href={`/properties/${property._id}`}
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer"
+                              title="View Details"
+                            >
+                              <Eye className="w-4 h-4" strokeWidth={2} />
+                            </Link>
+                            <button
+                              onClick={() => handleRemoveFavorite(property._id)}
+                              disabled={isRemoving}
+                              className={`p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer ${
+                                isRemoving ? "opacity-50 cursor-not-allowed" : ""
+                              }`}
+                              title="Remove from favorites"
+                            >
+                              {isRemoving ? (
+                                <div className="w-4 h-4 border-2 border-rose-600 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" strokeWidth={2} />
+                              )}
+                            </button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Footer Stats */}
-          <div className="mt-6 flex items-center justify-between text-xs text-gray-400 px-1">
+          <div className="mt-4 flex items-center justify-between text-xs text-gray-400 px-1">
             <span>Showing {filteredProperties.length} of {properties.length} favorites</span>
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1">

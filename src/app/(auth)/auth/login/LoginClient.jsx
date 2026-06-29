@@ -358,14 +358,14 @@ export default function LoginClient() {
                 <span className="text-lg font-bold text-blue-600">G</span>
                 <span className="text-sm font-medium text-gray-700">Google</span>
               </Button>
-              <Button
+              {/* <Button
                 onClick={handleDiscordLogin}
                 variant="secondary"
                 className="flex-1 cursor-pointer bg-gray-50 border-2 border-gray-200 rounded-xl py-3 hover:bg-gray-100 transition-colors"
               >
                 <span className="text-lg font-bold text-blue-600">D</span>
                 <span className="text-sm font-medium text-gray-700">Discord</span>
-              </Button>
+              </Button> */}
             </div>
           </div>
         </motion.div>

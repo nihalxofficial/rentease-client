@@ -120,7 +120,7 @@ export default function HeroBanner({
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight drop-shadow-lg">
               {title}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-blue-200 to-white mt-2 drop-shadow-lg">
-                With trust
+                Rent with Confidence
               </span>
             </h1>
 
